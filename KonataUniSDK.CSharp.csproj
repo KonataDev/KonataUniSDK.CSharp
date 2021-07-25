@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>KonataCSharp</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <PackageId>KonataUniSDK.CSharp</PackageId>
+    </PropertyGroup>
+
+</Project>
