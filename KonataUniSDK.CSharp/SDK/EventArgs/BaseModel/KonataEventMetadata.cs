@@ -35,7 +35,7 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
 
             var checkNum = byteReader.TakeAllBytes();
 
-            if (checkNum.Length != 1 || checkNum[0] != byteReader.Checksum())
+            if (checkNum.Length != 1 || byteReader.Checksum())
                 throw new ApplicationException("incorrect checkNum");
         }
 
@@ -43,7 +43,7 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
 
         internal ushort sessionId { get; }
 
-        private bool hasReturnValue { get; }
+        internal bool hasReturnValue { get; }
 
         private ushort parameterNumber { get; }
 
@@ -68,7 +68,8 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
                 "OnDestroy" => new DestroyEventArgs(this),
                 "OnPrivateMessage" => new PrivateMessageEventArgs(this),
                 "OnGroupMessage" => new GroupMessageEventArgs(this),
-                "OnGroupAdminChange" => new GroupMessageEventArgs(this),
+                "OnGroupAdminChange" => new GroupAdminChangeEventArgs(this),
+                "OnGroupMuteMember" => new GroupMuteMemberEvent(this),
                 _ => throw new ApplicationException("Not Supported EventArgs")
             };
         }
@@ -78,7 +79,7 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
             var writer = new ByteWriter();
             writer.WriteInt16(protocolVersion);
             writer.WriteInt16(sessionId);
-            writer.WriteInt16((ushort) (hasReturnValue ? 1 : 0));
+            writer.WriteInt16(0);
             writer.WriteInt16(1);
             writer.WriteInt16(unusedParameter1);
             writer.WriteInt16(unusedParameter2);

@@ -25,16 +25,16 @@ namespace KonataCSharp.SDK.Core
             }
         }
 
-        internal byte Checksum()
+        internal bool Checksum()
         {
             var sum = 0;
-            
-            for (int i = 0; i < _buffer.Length-1; ++i)
+
+            for (int i = 0; i < _buffer.Length - 1; ++i)
             {
-                sum += _buffer[1];
+                sum += _buffer[i];
             }
 
-            return (byte)(sum & 0xFF);
+            return (sum & 0xFF) == _buffer[^1];
         }
 
         internal byte TakeInt8()

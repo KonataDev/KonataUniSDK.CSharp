@@ -1,8 +1,10 @@
 ﻿using KonataCSharp.SDK.Core;
 using KonataCSharp.SDK.EventArgs.BaseModel;
+using KonataCSharp.SDK.EventArgs.Interfaces;
 
 namespace KonataCSharp.SDK.EventArgs.Events
 {
+    [Interface(typeof(IGroupAdminChange))]
     public class GroupAdminChangeEventArgs : KonataEventArgs
     {
         public enum GroupAdminChangeType : uint

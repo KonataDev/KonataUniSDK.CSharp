@@ -1,8 +1,10 @@
 ﻿using KonataCSharp.SDK.Core;
 using KonataCSharp.SDK.EventArgs.BaseModel;
+using KonataCSharp.SDK.EventArgs.Interfaces;
 
 namespace KonataCSharp.SDK.EventArgs.Events
 {
+    [Interface(typeof(IGroupMessage))]
     public class GroupMessageEventArgs : KonataEventArgs
     {
         internal GroupMessageEventArgs(KonataEventMetadata data) : base(data)

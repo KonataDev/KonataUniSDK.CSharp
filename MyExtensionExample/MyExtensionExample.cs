@@ -9,11 +9,11 @@ namespace MyExtensionExample
     {
         private static void Main(string[] args)
         {
-            KonataCSharp.SDK.Core.Program.Main(args);
+            KonataCSharp.SDK.Core.Program.Main(new []{"--port","2333"});
         }
     }
 
-    internal class MyExtensionExample : IOnStartup, IGroupMessage
+    internal class MyExtensionExample : IOnStartup, IGroupMessage, IGroupMuteMember
     {
         public KonataEventReturnType OnGroupMessage(GroupMessageEventArgs e)
         {
@@ -32,6 +32,14 @@ namespace MyExtensionExample
         public bool OnStartup(StartupEventArgs e)
         {
             return true;
+        }
+
+        public KonataEventReturnType OnGroupMuteMember(GroupMuteMemberEvent eventArgs)
+        {
+            Console.WriteLine("OnGroupMuteMember:\t FromGroup:\t" + eventArgs.FromGroup + "\tSeconds:\t" +
+                              eventArgs.TimeSeconds);
+            
+            return KonataEventReturnType.Ignore;
         }
     }
 }

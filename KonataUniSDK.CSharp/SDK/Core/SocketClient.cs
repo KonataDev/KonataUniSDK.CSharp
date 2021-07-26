@@ -3,12 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using KonataCSharp.SDK.EventArgs.BaseModel;
 using KonataCSharp.SDK.EventArgs.Enums;
 using KonataCSharp.SDK.EventArgs.Events;
-using KonataCSharp.SDK.EventArgs.Interfaces;
 
 namespace KonataCSharp.SDK.Core
 {
@@ -60,7 +60,7 @@ namespace KonataCSharp.SDK.Core
                 while (recvpktlen < pktlen)
                     recvpktlen += socket.Receive(databuffer, recvpktlen, pktlen - recvpktlen, SocketFlags.None);
 
-                //Console.WriteLine("RecvData:\t" + BitConverter.ToString(databuffer).Replace("-", ""));
+                Console.WriteLine("RecvData:\t" + BitConverter.ToString(databuffer).Replace("-", ""));
 
                 ThreadPool.QueueUserWorkItem(_ => EventHandle(databuffer));
             }
@@ -118,6 +118,7 @@ namespace KonataCSharp.SDK.Core
         private static void EventHandle(byte[] bytes)
         {
             var konataEventMetadata = new KonataEventMetadata(bytes);
+
             var eventargs = konataEventMetadata.KonataEventArgsConverter();
 
             if (eventargs is ResultEventArgs re)
@@ -132,56 +133,30 @@ namespace KonataCSharp.SDK.Core
 
             //eventHandler
 
-            switch (eventargs)
+            var type = eventargs.GetType();
+            var interfaceType = type.GetCustomAttribute<InterfaceAttribute>()?.Interface;
+            object result = null;
+            
+            if (Init.Container.TryGetValue(interfaceType!, out var botinstance))
             {
-                case StartupEventArgs eventArgs:
-                    konataEventMetadata.returnValue =
-                        !Init.Container.CanResolve<IOnStartup>()
-                        || Init.Container.Resolve<IOnStartup>().OnStartup(eventArgs);
-                    break;
-
-                case EnabledEventArgs eventArgs:
-                    konataEventMetadata.returnValue =
-                        !Init.Container.CanResolve<IOnEnabled>()
-                        || Init.Container.Resolve<IOnEnabled>().OnEnabled(eventArgs);
-                    break;
-
-                case DisabledEventArgs eventArgs:
-                    if (Init.Container.CanResolve<IOnDisabled>())
-                        Init.Container.Resolve<IOnDisabled>()
-                            .OnDisabled(eventArgs);
-                    break;
-
-                case DestroyEventArgs eventArgs:
-                    if (Init.Container.CanResolve<IOnDestroy>())
-                        Init.Container.Resolve<IOnDestroy>()
-                            .OnDestroy(eventArgs);
-                    break;
-
-                case PrivateMessageEventArgs eventArgs:
-                    konataEventMetadata.returnValue = Init.Container.CanResolve<IPrivateMessage>()
-                        ? Init.Container.Resolve<IPrivateMessage>()
-                            .OnPrivateMessage(eventArgs)
-                        : KonataEventReturnType.Ignore;
-                    break;
-
-                case GroupMessageEventArgs eventArgs:
-                    konataEventMetadata.returnValue = Init.Container.CanResolve<IGroupMessage>()
-                        ? Init.Container.Resolve<IGroupMessage>()
-                            .OnGroupMessage(eventArgs)
-                        : KonataEventReturnType.Ignore;
-                    break;
-
-                case GroupAdminChangeEventArgs eventArgs:
-                    konataEventMetadata.returnValue = Init.Container.CanResolve<IGroupAdminChange>()
-                        ? Init.Container.Resolve<IGroupAdminChange>()
-                            .OnGroupAdminChange(eventArgs)
-                        : KonataEventReturnType.Ignore;
-                    break;
+                result = interfaceType.GetMethods()[0].Invoke(botinstance,
+                    new object[] {eventargs});
             }
 
-            if (konataEventMetadata.returnValue != null)
+            if (konataEventMetadata.hasReturnValue)
+            {
+                konataEventMetadata.returnValue = result == null
+                    ? 0
+                    : result switch
+                    {
+                        bool i => i,
+                        uint i => i,
+                        KonataEventReturnType i => i,
+                        _ => KonataEventReturnType.Ignore
+                    };
+
                 socket.Send(konataEventMetadata.EncodeKonataReply());
+            }
         }
     }
 }
