@@ -5,6 +5,7 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IGroupAdminChange))]
+    [EventName("OnGroupPromoteAdmin")]
     public class GroupAdminChangeEventArgs : KonataEventArgs
     {
         public enum GroupAdminChangeType : uint
@@ -13,7 +14,7 @@ namespace KonataCSharp.SDK.EventArgs.Events
             Promote
         }
 
-        internal GroupAdminChangeEventArgs(KonataEventMetadata data) : base(data)
+        public GroupAdminChangeEventArgs(KonataEventMetadata data) : base(data)
         {
             Bot = ByteConverter.Cast<uint>(data.parameters["Bot"]);
             Group = ByteConverter.Cast<uint>(data.parameters["Group"]);

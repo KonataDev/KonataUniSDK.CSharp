@@ -6,6 +6,7 @@ namespace KonataCSharp.SDK.EventArgs.Enums
     {
         [Description("Ignore this event.")] Ignore = 0,
 
-        [Description("Block this event to the next extension.")] Blocked = 1
+        [Description("Block this event to the next extension.")]
+        Blocked = 1
     }
 }

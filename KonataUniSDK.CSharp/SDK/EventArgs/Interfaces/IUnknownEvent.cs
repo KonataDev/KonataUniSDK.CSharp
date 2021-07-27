@@ -4,11 +4,11 @@ using KonataCSharp.SDK.EventArgs.Events;
 
 namespace KonataCSharp.SDK.EventArgs.Interfaces
 {
-    public interface IGroupMessageRecall : IKonataEvent
+    public interface IUnknownEvent : IKonataEvent
     {
         /// <summary>
-        ///     处理群撤回消息事件
+        ///     处理未知事件
         /// </summary>
-        KonataEventReturnType OnGroupMessageRecall(GroupMessageRecallEventArgs eventArgs);
+        KonataEventReturnType OnUnknownEvent(KonataUnknownEventArgs eventArgs);
     }
 }

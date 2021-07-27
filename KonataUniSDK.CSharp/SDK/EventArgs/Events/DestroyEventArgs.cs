@@ -4,9 +4,10 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IOnDestroy))]
+    [EventName("OnDestroy")]
     public class DestroyEventArgs : KonataEventArgs
     {
-        internal DestroyEventArgs(KonataEventMetadata data) : base(data)
+        public DestroyEventArgs(KonataEventMetadata data) : base(data)
         {
         }
     }

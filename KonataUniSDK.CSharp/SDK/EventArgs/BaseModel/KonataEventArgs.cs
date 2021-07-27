@@ -1,4 +1,6 @@
-﻿namespace KonataCSharp.SDK.EventArgs.BaseModel
+﻿using KonataCSharp.SDK.EventArgs.Enums;
+
+namespace KonataCSharp.SDK.EventArgs.BaseModel
 {
     public abstract class KonataEventArgs
     {

@@ -5,9 +5,10 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IGroupMessage))]
+    [EventName("OnGroupMessage")]
     public class GroupMessageEventArgs : KonataEventArgs
     {
-        internal GroupMessageEventArgs(KonataEventMetadata data) : base(data)
+        public GroupMessageEventArgs(KonataEventMetadata data) : base(data)
         {
             Bot = ByteConverter.Cast<uint>(data.parameters["Bot"]);
             FromGroup = ByteConverter.Cast<uint>(data.parameters["Group"]);

@@ -3,9 +3,10 @@ using KonataCSharp.SDK.EventArgs.BaseModel;
 
 namespace KonataCSharp.SDK.EventArgs.Events
 {
+    [EventName("")]
     internal class ResultEventArgs : KonataEventArgs
     {
-        internal ResultEventArgs(KonataEventMetadata data) : base(data)
+        public ResultEventArgs(KonataEventMetadata data) : base(data)
         {
             resultData = ByteConverter.Cast<uint>(data.parameters["ResultData"]);
         }

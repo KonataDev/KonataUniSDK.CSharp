@@ -9,6 +9,6 @@ namespace KonataCSharp.SDK.EventArgs.Interfaces
         /// <summary>
         ///     处理插件开启事件
         /// </summary>
-        KonataEventReturnType OnGroupPoke(GroupPokeEvent eventArgs);
+        KonataEventReturnType OnGroupPoke(GroupPokeEventArgs eventArgs);
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using KonataCSharp.SDK.Core;
-using KonataCSharp.SDK.EventArgs.Events;
 
 namespace KonataCSharp.SDK.EventArgs.BaseModel
 {
-    internal class KonataEventMetadata
+    public class KonataEventMetadata
     {
         internal KonataEventMetadata(byte[] bytes)
         {
@@ -14,8 +13,7 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
             sessionId = byteReader.TakeInt16();
             hasReturnValue = byteReader.TakeInt16() == 1;
             parameterNumber = byteReader.TakeInt16();
-            unusedParameter1 = byteReader.TakeInt16();
-            unusedParameter2 = byteReader.TakeInt16();
+            byteReader.TakeBytes(4);
             var eventNamelen = byteReader.TakeInt8();
             eventName = byteReader.TakeString(eventNamelen);
 
@@ -36,10 +34,10 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
             var checkNum = byteReader.TakeAllBytes();
 
             if (checkNum.Length != 1 || byteReader.Checksum())
-                throw new ApplicationException("incorrect checkNum");
+                throw new ApplicationException("Incorrect checkNum.");
         }
 
-        private ushort protocolVersion { get; }
+        internal ushort protocolVersion { get; }
 
         internal ushort sessionId { get; }
 
@@ -47,45 +45,8 @@ namespace KonataCSharp.SDK.EventArgs.BaseModel
 
         private ushort parameterNumber { get; }
 
-        private ushort unusedParameter1 { get; }
-
-        private ushort unusedParameter2 { get; }
-
-        private string eventName { get; }
+        internal string eventName { get; }
 
         internal Dictionary<string, byte[]> parameters { get; }
-
-        internal object returnValue { get; set; }
-
-        internal KonataEventArgs KonataEventArgsConverter()
-        {
-            return eventName switch
-            {
-                "" => new ResultEventArgs(this),
-                "OnStartup" => new StartupEventArgs(this),
-                "OnEnabled" => new EnabledEventArgs(this),
-                "OnDisabled" => new DisabledEventArgs(this),
-                "OnDestroy" => new DestroyEventArgs(this),
-                "OnPrivateMessage" => new PrivateMessageEventArgs(this),
-                "OnGroupMessage" => new GroupMessageEventArgs(this),
-                "OnGroupAdminChange" => new GroupAdminChangeEventArgs(this),
-                "OnGroupMuteMember" => new GroupMuteMemberEvent(this),
-                _ => throw new ApplicationException("Not Supported EventArgs")
-            };
-        }
-
-        internal byte[] EncodeKonataReply()
-        {
-            var writer = new ByteWriter();
-            writer.WriteInt16(protocolVersion);
-            writer.WriteInt16(sessionId);
-            writer.WriteInt16(0);
-            writer.WriteInt16(1);
-            writer.WriteInt16(unusedParameter1);
-            writer.WriteInt16(unusedParameter2);
-            writer.WriteInt16(0);
-            writer.WriteWithLength(returnValue);
-            return writer.GetResult();
-        }
     }
 }

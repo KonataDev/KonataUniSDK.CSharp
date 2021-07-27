@@ -3,11 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using KonataCSharp.SDK.EventArgs.BaseModel;
-using KonataCSharp.SDK.EventArgs.Enums;
 using KonataCSharp.SDK.EventArgs.Events;
 
 namespace KonataCSharp.SDK.Core
@@ -115,47 +113,43 @@ namespace KonataCSharp.SDK.Core
             return await task.Task;
         }
 
+        private static void Send(ushort protocolVersion, ushort sessionId, object returnValue)
+        {
+            var writer = new ByteWriter();
+
+            writer.WriteInt16(protocolVersion);
+            writer.WriteInt16(sessionId);
+            writer.WriteInt16(0);
+            writer.WriteInt16(1);
+            writer.WriteInt16(0);
+            writer.WriteInt16(0);
+            writer.WriteInt16(0);
+            writer.WriteWithLength(returnValue);
+
+            socket.Send(writer.GetResult());
+        }
+
+
         private static void EventHandle(byte[] bytes)
         {
-            var konataEventMetadata = new KonataEventMetadata(bytes);
+            var metadata = new KonataEventMetadata(bytes);
 
-            var eventargs = konataEventMetadata.KonataEventArgsConverter();
+            var eventargs = Reflection.GetEventArgsInstance(metadata);
 
             if (eventargs is ResultEventArgs re)
             {
-                if (connPending.TryGetValue(konataEventMetadata.sessionId, out var task)) task.SetResult(re.resultData);
-
+                if (connPending.TryGetValue(metadata.sessionId, out var task))
+                    task.SetResult(re.resultData);
                 return;
             }
 
-
             //Console.WriteLine("RecvEventType:\t" + eventargs);
 
-            //eventHandler
+            var result = Reflection.InvokeMethods(eventargs);
 
-            var type = eventargs.GetType();
-            var interfaceType = type.GetCustomAttribute<InterfaceAttribute>()?.Interface;
-            object result = null;
-            
-            if (Init.Container.TryGetValue(interfaceType!, out var botinstance))
+            if (metadata.hasReturnValue)
             {
-                result = interfaceType.GetMethods()[0].Invoke(botinstance,
-                    new object[] {eventargs});
-            }
-
-            if (konataEventMetadata.hasReturnValue)
-            {
-                konataEventMetadata.returnValue = result == null
-                    ? 0
-                    : result switch
-                    {
-                        bool i => i,
-                        uint i => i,
-                        KonataEventReturnType i => i,
-                        _ => KonataEventReturnType.Ignore
-                    };
-
-                socket.Send(konataEventMetadata.EncodeKonataReply());
+                Send(metadata.protocolVersion, metadata.sessionId, result);
             }
         }
     }

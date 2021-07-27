@@ -10,11 +10,11 @@ namespace KonataCSharp.SDK.Core
     {
         private IEnumerable<byte> _buffer = new List<byte>();
 
-        internal int Length;
+        private int _length;
 
         private byte checksum => (byte) (_buffer.Aggregate(0, (current, i) => i + current) & 0xFF);
 
-        internal int Write(object value)
+        private int Write(object value)
         {
             return value switch
             {
@@ -25,7 +25,7 @@ namespace KonataCSharp.SDK.Core
                 string i => WriteString(i),
                 byte[] i => WriteBytes(i),
                 KonataEventReturnType i => WriteUInt32((uint) i),
-                _ => throw new ApplicationException("valueType not Supported")
+                _ => throw new ApplicationException("The type of the value is not supported.")
             };
         }
 
@@ -41,7 +41,7 @@ namespace KonataCSharp.SDK.Core
                     KonataEventReturnType => 4,
                     byte[] i => (uint) i.Length,
                     string i => (uint) Encoding.UTF8.GetBytes(i).Length,
-                    _ => throw new ApplicationException("value Type not Supported")
+                    _ => throw new ApplicationException("The type of the value is not supported.")
                 });
             return 4 + Write(value);
         }
@@ -49,21 +49,21 @@ namespace KonataCSharp.SDK.Core
         internal int WriteInt8(byte value)
         {
             _buffer = _buffer.Append(value);
-            Length++;
+            _length++;
             return 1;
         }
 
         internal int WriteInt16(ushort value)
         {
             _buffer = _buffer.Concat(BitConverter.GetBytes(value));
-            Length += 2;
+            _length += 2;
             return 2;
         }
 
-        internal int WriteUInt32(uint value)
+        private int WriteUInt32(uint value)
         {
             _buffer = _buffer.Concat(BitConverter.GetBytes(value));
-            Length += 4;
+            _length += 4;
             return 4;
         }
 
@@ -72,18 +72,18 @@ namespace KonataCSharp.SDK.Core
             return WriteBytes(Encoding.UTF8.GetBytes(value));
         }
 
-        internal int WriteBytes(byte[] value)
+        private int WriteBytes(byte[] value)
         {
             _buffer = _buffer.Concat(value);
-            Length += value.Length;
+            _length += value.Length;
             return value.Length;
         }
 
         internal byte[] GetResult()
         {
-            _buffer = BitConverter.GetBytes(Length + 5).Concat(_buffer);
+            _buffer = BitConverter.GetBytes(_length + 5).Concat(_buffer);
             _buffer = _buffer.Append(checksum);
-            Length += 5;
+            _length += 5;
             return _buffer.ToArray();
         }
     }

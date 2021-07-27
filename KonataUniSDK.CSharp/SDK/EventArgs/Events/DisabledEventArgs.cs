@@ -4,9 +4,10 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IOnDisabled))]
+    [EventName("OnDisabled")]
     public class DisabledEventArgs : KonataEventArgs
     {
-        internal DisabledEventArgs(KonataEventMetadata data) : base(data)
+        public DisabledEventArgs(KonataEventMetadata data) : base(data)
         {
         }
     }

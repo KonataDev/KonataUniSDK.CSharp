@@ -9,6 +9,6 @@ namespace KonataCSharp.SDK.EventArgs.Interfaces
         /// <summary>
         ///     处理群禁言事件
         /// </summary>
-        KonataEventReturnType OnGroupMuteMember(GroupMuteMemberEvent eventArgs);
+        KonataEventReturnType OnGroupMuteMember(GroupMuteMemberEventArgs eventArgs);
     }
 }

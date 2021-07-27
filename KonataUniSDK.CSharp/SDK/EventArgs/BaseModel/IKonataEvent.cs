@@ -1,6 +1,4 @@
-﻿using KonataCSharp.SDK.EventArgs.Enums;
-
-namespace KonataCSharp.SDK.EventArgs.BaseModel
+﻿namespace KonataCSharp.SDK.EventArgs.BaseModel
 {
     /// <summary>
     ///     事件接口的抽象接口

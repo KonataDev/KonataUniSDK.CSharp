@@ -4,9 +4,10 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IOnStartup))]
+    [EventName("OnStartup")]
     public class StartupEventArgs : KonataEventArgs
     {
-        internal StartupEventArgs(KonataEventMetadata data) : base(data)
+        public StartupEventArgs(KonataEventMetadata data) : base(data)
         {
         }
     }

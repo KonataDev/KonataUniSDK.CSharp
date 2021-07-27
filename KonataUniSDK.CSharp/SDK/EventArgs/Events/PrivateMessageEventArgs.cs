@@ -5,9 +5,10 @@ using KonataCSharp.SDK.EventArgs.Interfaces;
 namespace KonataCSharp.SDK.EventArgs.Events
 {
     [Interface(typeof(IPrivateMessage))]
+    [EventName("OnPrivateMessage")]
     public class PrivateMessageEventArgs : KonataEventArgs
     {
-        internal PrivateMessageEventArgs(KonataEventMetadata data) : base(data)
+        public PrivateMessageEventArgs(KonataEventMetadata data) : base(data)
         {
             Bot = ByteConverter.Cast<uint>(data.parameters["Bot"]);
             FromQq = ByteConverter.Cast<uint>(data.parameters["Friend"]);

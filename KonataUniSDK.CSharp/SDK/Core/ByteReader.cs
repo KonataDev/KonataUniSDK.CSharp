@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace KonataCSharp.SDK.Core
@@ -29,10 +28,7 @@ namespace KonataCSharp.SDK.Core
         {
             var sum = 0;
 
-            for (int i = 0; i < _buffer.Length - 1; ++i)
-            {
-                sum += _buffer[i];
-            }
+            for (var i = 0; i < _buffer.Length - 1; ++i) sum += _buffer[i];
 
             return (sum & 0xFF) == _buffer[^1];
         }
