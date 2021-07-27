@@ -6,7 +6,12 @@ namespace KonataCSharp.SDK.Core
     {
         public static int Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += (_, e) => Console.WriteLine(e);
+            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            {
+                Console.WriteLine($"{DateTime.Now}\n{e.ExceptionObject as Exception}\n\nPress any key to exit...\n");
+                //Console.ReadKey();
+                Environment.Exit(-Math.Abs(e.ExceptionObject.GetHashCode()));
+            };
 
             Reflection.InterfaceInitialize();
 
@@ -14,7 +19,7 @@ namespace KonataCSharp.SDK.Core
                 if (args[i] == "--port" && i < args.Length)
                 {
                     SocketClient.Connect(Convert.ToInt32(args[i + 1]));
-                    // break;
+                    break;
                 }
 
             throw new ApplicationException("Port is not set. please set the port as \"--port 2333\".");

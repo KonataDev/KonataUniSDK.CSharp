@@ -28,14 +28,19 @@ namespace KonataCSharp.SDK.Core
             return info.Instance != null
                 ? info.MethodInfo.Invoke(info.Instance, new object[] {eventargs}) ?? KonataEventReturnType.Ignore
                 : eventargs is StartupEventArgs or EnabledEventArgs
-                    ? true : KonataEventReturnType.Ignore;
+                    ? true
+                    : KonataEventReturnType.Ignore;
         }
 
         internal static void InterfaceInitialize()
         {
-            var definedTypes = Assembly.GetEntryAssembly()?.DefinedTypes;
+            var definedTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(assembly => assembly != Assembly.GetExecutingAssembly())
+                .Select(i => i.DefinedTypes)
+                .Aggregate((i, j) => i.Concat(j)).ToArray();
 
-            if (definedTypes != null)
+
+            if (definedTypes.Length > 0)
                 foreach (var type in definedTypes)
                 foreach (var intpe in type.ImplementedInterfaces.Where(i => InterfaceContainer.ContainsKey(i)))
                     InterfaceContainer[intpe].Instance =
